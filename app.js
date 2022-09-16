@@ -1,5 +1,6 @@
 const express = require('express')
 const app = express()
+const axios=require('axios')
 const port = 3000
 var bodyParser = require('body-parser');
 // Create application/x-www-form-urlencoded parser
@@ -21,7 +22,11 @@ app.post('/recieve-data',(req,res)=>{
         return;
     }
     let data=req.body;
-    console.log(data)
+    let isOk=cleanData(data);
+    if(isOk == null){
+        res.send("Upload a better photu");
+    }
+
 
    
    res.write("OK")
@@ -33,11 +38,40 @@ catch(error){
 
 // takes raw json data and returns the gst no from it
 const cleanData=(data)=>{
-    const cleanedData="";
-    return cleanedData
+    let cleanedData;
+    const regex = ".*^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}.*";
+
+    for(let i=0;i<=data.length-15;i+=1){
+        let temp=data.substring(i,i+15);
+        let ans=temp.match(regex);
+        if(ans){
+            cleanedData=ans
+            //console.log(ans)
+        }
+    }
+
+    // gst no returner
+    return verifyGST(cleanedData)
 }
 
-const verifyGST=(gstNo)=>{
+const verifyGST=async (gstNo)=>{
+
+        let data;
+    axios.get(`https://services.gst.gov.in/services/api/search/goodservice?gstin=${gstNo}`)
+        .then(resp => {
+            if(resp.hasOwnProperty(('errorCode'))){
+                resp.return(false);
+            }
+            return resp.write(true);
+            console.log(resp.data);
+        })
+        .catch(err => {
+            // Handle Error Here
+            console.error(err);
+            return res.write("upload a better image");
+        });
+    //const res = await axios('/data');
+
 
 
 
@@ -45,3 +79,6 @@ const verifyGST=(gstNo)=>{
 app.listen(port, () => {
     console.log(`Example app listening on port ${port}`)
 })
+
+console.log(cleanData("APDAFDPAKDPAKDPA33AAPCS4963G1Z0DJadjnADNANJ33AAPCS4963G1Z0dsds"))
+console.log(verifyGST("33AAPCS4963G1Z0"))
