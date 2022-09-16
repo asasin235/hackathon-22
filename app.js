@@ -4,6 +4,8 @@ const port = 3000
 var bodyParser = require('body-parser');
 // Create application/x-www-form-urlencoded parser
 var urlencodedParser = bodyParser.urlencoded({ extended: false })
+app.use(urlencodedParser)
+app.use(bodyParser.json())
 app.get('/', (req, res) => {
     res.send('Hello World!')
 })
@@ -11,19 +13,22 @@ app.get('/getRoute',(req,res)=>{
 })
 app.post('/recieve-data',(req,res)=>{
 
-    response = {
-        first_name:req.body,
-        last_name:req.body
-    };
-    console.log(response);
-    res.end(JSON.stringify(response));
-    console.log(req)
+    try{
+    // res.end(JSON.stringify(res));
+    console.log(req.body)
     if(req.body!== null ){
         res.end("khali kyu bhej rha h")
+        return;
     }
     let data=req.body;
+    console.log(data)
 
-    res.end("okay");
+   
+   res.write("OK")
+}
+catch(error){
+    console.log(error);
+}
 })
 
 // takes raw json data and returns the gst no from it
