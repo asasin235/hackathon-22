@@ -12,9 +12,21 @@ app.post('/recieve-data',(req,res)=>{
         res.send("khali kyu bhej rha h")
     }
     let data=req.body;
-    console.log(data)
+
     res.send("okay");
 })
+
+// takes raw json data and returns the gst no from it
+const cleanData=(data)=>{
+    const cleanedData;
+    return cleanedData
+}
+
+const verifyGST=(gstNo)=>{
+
+
+
+}
 app.listen(port, () => {
     console.log(`Example app listening on port ${port}`)
 })
