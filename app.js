@@ -17,8 +17,8 @@ app.post('/recieve-data',(req,res)=>{
     try{
     // res.end(JSON.stringify(res));
     console.log(req.body)
-    if(req.body!== null ){
-        res.end("khali kyu bhej rha h")
+    if(req.body === null ){
+        res.send("khali kyu bhej rha h")
         return;
     }
     let data=req.body;
@@ -29,7 +29,7 @@ app.post('/recieve-data',(req,res)=>{
 
 
    
-   res.write("OK")
+   res.send(isOk);
 }
 catch(error){
     console.log(error);
@@ -50,6 +50,10 @@ const cleanData=(data)=>{
         }
     }
 
+    if(cleanData===null){
+        return false;
+    }
+
     // gst no returner
     return verifyGST(cleanedData)
 }
@@ -58,17 +62,17 @@ const verifyGST=async (gstNo)=>{
 
         let data;
     axios.get(`https://services.gst.gov.in/services/api/search/goodservice?gstin=${gstNo}`)
-        .then(resp => {
+        .then((resp) => {
             if(resp.hasOwnProperty(('errorCode'))){
-                resp.return(false);
+                return(false);
             }
-            return resp.write(true);
+            return (true);
             console.log(resp.data);
         })
         .catch(err => {
             // Handle Error Here
             console.error(err);
-            return res.write("upload a better image");
+            return ("upload a better image");
         });
     //const res = await axios('/data');
 
@@ -80,5 +84,5 @@ app.listen(port, () => {
     console.log(`Example app listening on port ${port}`)
 })
 
-console.log(cleanData("APDAFDPAKDPAKDPA33AAPCS4963G1Z0DJadjnADNANJ33AAPCS4963G1Z0dsds"))
-console.log(verifyGST("33AAPCS4963G1Z0"))
+// console.log(cleanData("APDAFDPAKDPAKDPA33AAPCS4963G1Z0DJadjnADNANJ33AAPCS4963G1Z0dsds"))
+// console.log(verifyGST("33AAPCS4963G1Z0"))
