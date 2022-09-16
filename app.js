@@ -12,7 +12,7 @@ app.get('/', (req, res) => {
 })
 app.get('/getRoute',(req,res)=>{
 })
-app.post('/recieve-data',(req,res)=>{
+app.post('/recieve-data',async (req,res)=>{
 
     try{
     // res.end(JSON.stringify(res));
@@ -21,23 +21,24 @@ app.post('/recieve-data',(req,res)=>{
         res.send("khali kyu bhej rha h")
         return;
     }
-    let data=req.body;
-    let isOk=cleanData(data);
-    if(isOk == null){
-        res.send("Upload a better photu");
-    }
+    let data=req.body.str;
+    console.log( data)
+
+   let x= await cleanData(data);
+   console.log(x)
+   res.send(x)
 
 
-   
-   res.send(isOk);
 }
 catch(error){
     console.log(error);
 }
 })
 
+
 // takes raw json data and returns the gst no from it
-const cleanData=(data)=>{
+const cleanData= async (data)=>{
+
     let cleanedData;
     const regex = ".*^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}.*";
 
@@ -50,30 +51,40 @@ const cleanData=(data)=>{
         }
     }
 
-    if(cleanData===null){
+    if(cleanData===undefined){
         return false;
     }
-
-    // gst no returner
-    return verifyGST(cleanedData)
+    console.log("billi")
+    const res=await verifyGST(cleanedData);
+    console.log(res);
+    return res;
 }
 
-const verifyGST=async (gstNo)=>{
+const verifyGST=   async (gstNo)=>{
 
-        let data;
-    axios.get(`https://services.gst.gov.in/services/api/search/goodservice?gstin=${gstNo}`)
-        .then((resp) => {
-            if(resp.hasOwnProperty(('errorCode'))){
-                return(false);
-            }
-            return (true);
-            console.log(resp.data);
-        })
-        .catch(err => {
-            // Handle Error Here
-            console.error(err);
-            return ("upload a better image");
-        });
+        let flag=true;
+    // const q= axios.get(`https://services.gst.gov.in/services/api/search/goodservice?gstin=${gstNo}`)
+    //     .then((resp) => {
+    //         if(resp && resp.data && resp.data.hasOwnProperty(('errorCode'))){
+    //             flag=false;
+    //         }
+    //
+    //
+    //     })
+    //     .catch(err => {
+    //         // Handle Error Here
+    //         console.error(err);
+    //         return ("upload a better image");
+    //     });
+
+    const q= await axios.get(`https://services.gst.gov.in/services/api/search/goodservice?gstin=${gstNo}`);
+   // console.log(q.data)
+
+    if(q.data && q.data.hasOwnProperty('errorCode')){
+        flag=false;
+    }
+
+     return flag;
     //const res = await axios('/data');
 
 
